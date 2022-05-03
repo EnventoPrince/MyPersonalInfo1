@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewData["Title"] = "CandidateList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <h1>CandidateList</h1>
+        <div class="col-md-4">
+            <div class="form-group">
+                <select id="selectstatus" class="form-control">
+                    <option value="-2">All</option>
+                    <option value="1">Aproved</option>
+                    <option value="-1">Rejected</option>
+                    <option value="0">Pending</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <button type="button" title="Search" class="btn btn-warning" onclick="GetRecords()">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table id="datatable" class="table table-striped table-bordered table-sm dt-responsive w-100">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th class="col-1">Sr.</th>
+                            <th class="col-1">Name</th>
+                            <th class="col-1">Email</th>
+                            <th class="col-1">Phone</th>
+                            <th class="col-1">Reg.Date</th>
+                            <th class="col-1">GitProfile</th>
+                            <th class="col-1">LiveInUS</th>
+                            <th class="col-2">About</th>
+                            <th class="col-1">Curriculum&nbsp;Vitae</th>
+                            <th class="col-1">Cover&nbsp;Letter</th>
+                            <th class="col-1">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records_table"></tbody>
+                </table><!-- /.table -->
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetRecords();
+    });
+
+    function GetRecords() {
+        var searchData = new FormData();
+        searchData.append("selectstatus", $("#selectstatus").val());
+        $.blockUI({ message: "<center><div class='loader'></div></center>" });
+        $.ajax({
+            type: "POST",
+            url: "/Home/GetData",
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            data: searchData,
+            success: function (Response) {
+                $.unblockUI();
+                var trHTML = "";
+                $('#records_table').empty();
+                var Sr = 1;
+                if (Response != "" || Response != "null") {
+                    $.each(Response, function (i, item) {
+                        trHTML += "<tr>";
+                        trHTML += "<td>" + Sr++ + "</td>";
+                        trHTML += "<td>" + item.Name + "</td>";
+                        trHTML += "<td>" + item.EmailAddress + "</td>";
+                        trHTML += "<td>" + item.ContactNo + "</td>";
+                        trHTML += "<td>" + item.Reg_Date + "</td>";
+                        trHTML += "<td>" + item.GitProfile + "</td>";
+                        trHTML += "<td>" + item.LiveInUS + "</td>";
+                        trHTML += "<td>" + item.AboutYou + "</td>";
+                        trHTML += "<td>" + item.CV + "</td>";
+                        trHTML += "<td>" + item.CL + "</td>";
+                        trHTML += "<td>" + item.StatusTxt + "</td>";
+                        trHTML += "</tr>";
+                    });
+                }
+                else {
+                    trHTML += "<tr><td colspan='12' class='text-center'><b style='color:red;font-size:18px;font-weight:bold;'>No Record Found.</b></td></tr>";
+                }
+                $('#records_table').append(trHTML);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $.unblockUI();
+                swal({ title: "Candidate List Notification", text: errorThrown, timer: 3000, type: "error", showConfirmButton: false });
+                return;
+            }
+        });
+    }
+</script>

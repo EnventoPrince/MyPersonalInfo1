@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Candidates>
+  <Candidate>
+    <Id>1</Id>
+    <FirstName>Dheeraj</FirstName>
+    <LastName>Pandey</LastName>
+    <EmailAddress>dheerajpandey126@gmail.com</EmailAddress>
+    <ContactNo>78439 19422</ContactNo>
+    <GitProfile>https://github.com/Prince7843</GitProfile>
+    <LiveInUS>false</LiveInUS>
+    <AboutYou>Hi, I am software developer in enventosoft it solution pvt. ltd.</AboutYou>
+    <CVFile>0fc5f722-0722-4b40-900c-55e518908544_DheerajPandeyCV.pdf</CVFile>
+    <CoverLetter></CoverLetter>
+    <RegDate>2022-05-03T12:43:13.2130761Z</RegDate>
+    <Status>1</Status>
+  </Candidate>
+</Candidates>

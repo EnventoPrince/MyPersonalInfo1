@@ -1,0 +1,155 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid">
+    <h4>Candidate Information</h4>
+    <form class="row g-3" enctype="multipart/form-data">
+        <div class="col-md-4">
+            <label for="validationFirstName" class="form-label">First name</label>&nbsp;<span class="text-danger">*</span>
+            <input type="text" class="form-control" id="first_name" placeholder="First name" required>
+            <div class="invalid-feedback">
+                Please provide a valid input.
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationLastName" class="form-label">Last name</label>
+            <input type="text" class="form-control" id="last_name" placeholder="Last name">
+        </div>
+        <div class="col-md-4">
+            <label for="validationEmail" class="form-label">Email</label>&nbsp;<span class="text-danger">*</span>
+            <input type="email" name="email" placeholder="Email" class="form-control" id="email" required>
+            <div class="invalid-feedback">
+                Please provide a valid email Id.
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationPhone" class="form-label">Phone number</label>
+            <input type="tel" class="form-control" id="phone_number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="12" placeholder="Phone number">
+        </div>
+        <div class="col-md-4">
+            <label for="validationLive" class="form-label">Do you live in the US?</label>&nbsp;<span class="text-danger">*</span>
+            <select class="form-control" id="live_in_us" required>
+                <option value="">Choose...</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <div class="invalid-feedback">
+                Please input a valid answer.
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationGitProfile" class="form-label">Git Profile</label>&nbsp;<span class="text-danger">*</span>
+            <input type="url" class="form-control" id="git_profile" placeholder="Git Profile" required>
+            <div class="invalid-feedback">
+                Please provide a valid input.
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationCV" class="form-label">Upload CV</label>&nbsp;<span class="text-danger">*</span>
+            <input type="file" class="form-control" aria-label="file example" id="Cvfile" name="Cv" required>
+            <div class="invalid-feedback">Invalid form file</div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationCoverLetter" class="form-label">Upload Cover Letter</label>
+            <input type="file" class="form-control" id="cover_letter" name="cover_letter" aria-label="file example">
+        </div>
+        <div class="col-md-12">
+            <label for="validationAboutyou" class="form-label">About you</label>&nbsp;<span class="text-danger">*</span>
+            <textarea class="form-control" id="about_you" placeholder="About you" required></textarea>
+            <div class="invalid-feedback">
+                Please enter somthing about you.
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button class="btn btn-primary" onclick="SaveData();" type="button">Submit</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function SaveData() {
+        if ($("#first_name").val() == "") {
+            $("#first_name").attr("class", "form-control is-invalid");
+            return;
+        }
+        if ($("#email").val() == "") {
+            $("#email").attr("class", "form-control is-invalid");
+            return;
+        }
+        else {
+            var email = $("#email").val();
+            var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            if (!expr.test(email)) {
+                $("#email").attr("class", "form-control is-invalid");
+                return;
+            }
+        }
+        if ($("#live_in_us").val() == "") {
+            $("#live_in_us").attr("class", "form-control is-invalid");
+            return;
+        }
+        if ($("#git_profile").val() == "") {
+            $("#git_profile").attr("class", "form-control is-invalid");
+            return;
+        }
+        if ($("#Cvfile").val() == "") {
+            $("#Cvfile").attr("class", "form-control is-invalid");
+            return;
+        }
+        if ($("#about_you").val() == "") {
+            $("#about_you").attr("class", "form-control is-invalid");
+            return;
+        }
+        var formData = new FormData();
+        formData.append("FirstName", $("#first_name").val());
+        formData.append("LastName", $("#last_name").val());
+        formData.append("EmailAddress", $("#email").val());
+        formData.append("ContactNo", $("#phone_number").val());
+        formData.append("GitProfile", $("#git_profile").val());
+        formData.append("LiveInUS", $("#live_in_us").val());
+        formData.append("AboutYou", $("#about_you").val());
+        formData.append("CVFile", $('#Cvfile')[0].files[0]);
+        formData.append("CoverLetter", $('#cover_letter')[0].files[0]);
+        $.blockUI({ message: "<center><div class='loader'></div></center>" });
+        $.ajax({
+            type: "POST",
+            url: "/Home/SaveData",
+            data: formData,
+            dataType: "JSON",
+            contentType: false,
+            processData: false,
+            success: function (Response) {
+                if (Response.Success) {
+                    $.unblockUI();
+                    ResetForm();
+                    swal({ title: "Candidate Details Notification", text: Response.Message, timer: 3000, type: "success", showConfirmButton: false });
+                    setTimeout(function () {
+                        window.location.href = "CandidateList";
+                    }, 5000);
+                    return;
+                }
+                else {
+                    $.unblockUI();
+                    swal({ title: "Candidate Details Notification", text: Response.Message, timer: 3000, type: "error", showConfirmButton: false });
+                    return;
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                swal({ title: "Candidate Details Notification", text: errorThrown, timer: 3000, type: "error", showConfirmButton: false });
+                return;
+            }
+        });
+    }
+
+    function ResetForm() {
+        $("#first_name").val('');
+        $("#last_name").val('');
+        $("#email").val('');
+        $("#phone_number").val('');
+        $("#git_profile").val('');
+        $("#live_in_us").val('');
+        $("#about_you").val('');
+        $('#Cvfile').val('');
+        $('#cover_letter').val('');
+    }
+</script>
